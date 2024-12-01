@@ -14,18 +14,28 @@ db.exec(`
 
 const router = new Router();
 
-router.get("/api/recap", async (ctx) => {
+router.get("/api/recap", (ctx) => {
   const params = ctx.request.url.searchParams;
   const messages = JSON.parse(params.get("messages") ?? "[]");
-  if (Array.isArray(messages) && messages.length > 0) {
-    const captures = await db.sql`
-      SELECT * FROM captures WHERE message IN (${messages});
-    `;
-    ctx.response.body = captures;
+
+  if (!Array.isArray(messages) || messages.length === 0) {
+    ctx.response.body = "No messages";
+    ctx.response.status = 400;
     return;
   }
-  ctx.response.body = "No messages";
-  ctx.response.status = 400;
+
+  const placeholders = messages.map(() => "?").join(",");
+  const query = `SELECT * FROM captures WHERE message IN (${placeholders})`;
+  db.all(query, messages, function (err, rows) {
+    if (err) {
+      ctx.response.status = 500;
+      ctx.response.body = { error: err.message };
+      return;
+    }
+
+    ctx.response.status = 200;
+    ctx.response.body = rows;
+  });
 });
 
 router.post("/api/capture", async (ctx) => {
@@ -37,14 +47,18 @@ router.post("/api/capture", async (ctx) => {
     return;
   }
 
-  const result = await db.sql`
-    INSERT INTO captures (message, data) VALUES (${data.message}, ${
-    data.data ?? null
-  });
-  `;
+  const query = `INSERT INTO captures (message, data) VALUES (?, ?)`;
 
-  ctx.response.status = 200;
-  ctx.response.body = result;
+  db.run(query, [data.message, data.data ?? null], function (err) {
+    if (err) {
+      ctx.response.status = 500;
+      ctx.response.body = { error: err.message };
+      return;
+    }
+
+    ctx.response.status = 200;
+    ctx.response.body = { success: true };
+  });
 });
 
 const app = new Application();
