@@ -1,10 +1,13 @@
 import { Application, Router } from "@oak/oak";
-import { Database } from "@sqlitecloud/drivers";
+import { createClient } from "@libsql/client";
 import "@std/dotenv/load";
 
-const db = new Database(Deno.env.get("DATABASE_URL") ?? "captures.db");
+const client = createClient({
+  url: Deno.env.get("DATABASE_URL") ?? ":memory:",
+  authToken: Deno.env.get("DATABASE_KEY") ?? "",
+});
 
-db.exec(`
+await client.execute(`
   CREATE TABLE IF NOT EXISTS captures (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   message TEXT NOT NULL,
@@ -14,7 +17,7 @@ db.exec(`
 
 const router = new Router();
 
-router.get("/api/recap", (ctx) => {
+router.get("/api/recap", async (ctx) => {
   const params = ctx.request.url.searchParams;
   const messages = JSON.parse(params.get("messages") ?? "[]");
 
@@ -25,17 +28,20 @@ router.get("/api/recap", (ctx) => {
   }
 
   const placeholders = messages.map(() => "?").join(",");
-  const query = `SELECT * FROM captures WHERE message IN (${placeholders})`;
-  db.all(query, messages, function (err, rows) {
-    if (err) {
-      ctx.response.status = 500;
-      ctx.response.body = { error: err.message };
-      return;
-    }
+
+  try {
+    const { rows } = await client.execute({
+      sql: `SELECT * FROM captures WHERE message IN (${placeholders})`,
+      args: messages,
+    });
 
     ctx.response.status = 200;
     ctx.response.body = rows;
-  });
+  } catch (err) {
+    console.error(err);
+    ctx.response.status = 500;
+    ctx.response.body = { error: (err as Error).message };
+  }
 });
 
 router.post("/api/capture", async (ctx) => {
@@ -47,18 +53,19 @@ router.post("/api/capture", async (ctx) => {
     return;
   }
 
-  const query = `INSERT INTO captures (message, data) VALUES (?, ?)`;
-
-  db.run(query, [data.message, data.data ?? null], function (err) {
-    if (err) {
-      ctx.response.status = 500;
-      ctx.response.body = { error: err.message };
-      return;
-    }
+  try {
+    await client.execute({
+      sql: `INSERT INTO captures (message, data) VALUES (?, ?)`,
+      args: [data.message, data.data ?? null],
+    });
 
     ctx.response.status = 200;
     ctx.response.body = { success: true };
-  });
+  } catch (err) {
+    console.error(err);
+    ctx.response.status = 500;
+    ctx.response.body = { error: (err as Error).message };
+  }
 });
 
 const app = new Application();
