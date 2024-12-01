@@ -1,23 +1,24 @@
 import { Application, Router } from "@oak/oak";
-import { Database } from "@db/sqlite";
+import { Database } from "@sqlitecloud/drivers";
+import "@std/dotenv/load";
 
-const db = new Database("captures.db");
+const db = new Database(Deno.env.get("DATABASE_URL") ?? "captures.db");
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS captures (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      message TEXT NOT NULL,
-      data TEXT DEFAULT NULL CHECK (json_valid(data))
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  message TEXT NOT NULL,
+  data TEXT DEFAULT NULL CHECK (json_valid(data))
   );
 `);
 
 const router = new Router();
 
-router.get("/api/recap", (ctx) => {
+router.get("/api/recap", async (ctx) => {
   const params = ctx.request.url.searchParams;
   const messages = JSON.parse(params.get("messages") ?? "[]");
   if (Array.isArray(messages) && messages.length > 0) {
-    const captures = db.sql`
+    const captures = await db.sql`
       SELECT * FROM captures WHERE message IN (${messages});
     `;
     ctx.response.body = captures;
@@ -36,7 +37,7 @@ router.post("/api/capture", async (ctx) => {
     return;
   }
 
-  const result = db.sql`
+  const result = await db.sql`
     INSERT INTO captures (message, data) VALUES (${data.message}, ${
     data.data ?? null
   });
