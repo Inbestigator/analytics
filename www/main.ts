@@ -56,7 +56,7 @@ router.post("/api/capture", async (ctx) => {
   try {
     await client.execute({
       sql: `INSERT INTO captures (message, data) VALUES (?, ?)`,
-      args: [data.message, data.data ?? null],
+      args: [data.message, JSON.stringify(data.data) ?? null],
     });
 
     ctx.response.status = 200;
