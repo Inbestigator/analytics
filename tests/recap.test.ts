@@ -6,9 +6,9 @@ Deno.test(async function successfulRecap() {
     url: "http://localhost:8000/api/recap",
   });
 
-  assertEquals(recapped instanceof Response, true);
-  if (recapped instanceof Response && recapped.body) {
-    console.log(await recapped.json());
+  assertEquals(recapped instanceof Error, false);
+  if (!(recapped instanceof Error)) {
+    console.log(recapped);
   }
 });
 

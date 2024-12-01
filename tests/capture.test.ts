@@ -2,18 +2,11 @@ import { capture } from "@capture/analytics";
 import { assertEquals } from "@std/assert";
 
 Deno.test(async function successfulCapture() {
-  const captured = await capture(
-    "test",
-    { a: 1, b: 2, c: 3 },
-    {
-      url: "http://localhost:8000/api/capture",
-    },
-  );
+  const captured = await capture("test", undefined, {
+    url: "http://localhost:8000/api/capture",
+  });
 
-  assertEquals(captured instanceof Response, true);
-  if (captured instanceof Response && captured.body) {
-    await captured.body.cancel();
-  }
+  assertEquals(captured instanceof Error, false);
 });
 
 Deno.test(async function failCapture() {
@@ -26,6 +19,7 @@ Deno.test(async function failCapture() {
   );
 
   assertEquals(captured instanceof Error, true);
+
   if (captured instanceof Error) {
     assertEquals(captured.message, 'Failed to capture "test"');
   } else {

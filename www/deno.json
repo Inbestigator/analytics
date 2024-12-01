@@ -1,8 +1,9 @@
 {
   "tasks": {
-    "dev": "deno run -A --watch --unstable-kv main.ts"
+    "dev": "deno run -A --watch main.ts"
   },
   "imports": {
+    "@db/sqlite": "jsr:@db/sqlite@^0.12.0",
     "@oak/oak": "jsr:@oak/oak@^17.1.3"
   }
 }

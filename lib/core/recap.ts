@@ -10,7 +10,7 @@ export default async function recap(
   options = {
     url: "https://capture-analytics.deno.dev/api/recap",
   },
-): Promise<Response | Error> {
+): Promise<unknown | Error> {
   try {
     const res = await fetch(
       options.url + `?messages=${encodeURIComponent(JSON.stringify(messages))}`,
@@ -23,7 +23,7 @@ export default async function recap(
 
     console.log(green("Recapped data"));
 
-    return res;
+    return res.json();
   } catch (error) {
     console.error(red("Failed to recap data"), error);
 

@@ -13,7 +13,7 @@ export default async function capture(
   options = {
     url: "https://capture-analytics.deno.dev/api/capture",
   },
-): Promise<Response | Error> {
+): Promise<void | Error> {
   try {
     const res = await fetch(options.url, {
       method: "POST",
@@ -28,7 +28,7 @@ export default async function capture(
 
     console.log(green("Captured"), message);
 
-    return res;
+    res.body?.cancel();
   } catch (error) {
     console.error(red("Failed to capture"), message, error);
 

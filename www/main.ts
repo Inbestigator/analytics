@@ -1,19 +1,25 @@
 import { Application, Router } from "@oak/oak";
+import { Database } from "@db/sqlite";
 
-const db = await Deno.openKv();
+const db = new Database("captures.db");
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS captures (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      message TEXT NOT NULL,
+      data TEXT DEFAULT NULL CHECK (json_valid(data))
+  );
+`);
 
 const router = new Router();
 
-router.get("/api/recap", async (ctx) => {
+router.get("/api/recap", (ctx) => {
   const params = ctx.request.url.searchParams;
   const messages = JSON.parse(params.get("messages") ?? "[]");
   if (Array.isArray(messages) && messages.length > 0) {
-    const iter = db.list({
-      start: ["capture"],
-      end: messages,
-    });
-    const captures = [];
-    for await (const res of iter) captures.push(res);
+    const captures = db.sql`
+      SELECT * FROM captures WHERE message IN (${messages});
+    `;
     ctx.response.body = captures;
     return;
   }
@@ -23,11 +29,21 @@ router.get("/api/recap", async (ctx) => {
 
 router.post("/api/capture", async (ctx) => {
   const data = await ctx.request.body.json();
-  db.atomic()
-    .set(["capture", data.message, crypto.randomUUID()], data.data)
-    .commit();
+
+  if (!("message" in data)) {
+    ctx.response.body = "Missing message";
+    ctx.response.status = 400;
+    return;
+  }
+
+  const result = db.sql`
+    INSERT INTO captures (message, data) VALUES (${data.message}, ${
+    data.data ?? null
+  });
+  `;
 
   ctx.response.status = 200;
+  ctx.response.body = result;
 });
 
 const app = new Application();

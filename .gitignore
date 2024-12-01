@@ -1,5 +1,5 @@
 .env
+*.db
 deno.lock
 node_modules
-.next
 pnpm-lock.yaml
