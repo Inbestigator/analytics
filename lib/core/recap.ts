@@ -8,7 +8,7 @@ import { green, red } from "@std/fmt/colors";
 export default async function recap(
   messages: string[],
   options = {
-    url: "https://analytics-h3.deno.dev/api/recap",
+    url: "https://capture-analytics.deno.dev/api/recap",
   },
 ): Promise<Response | Error> {
   try {

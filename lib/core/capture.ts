@@ -11,7 +11,7 @@ export default async function capture(
   message: string,
   data?: Record<string | number | symbol, unknown>,
   options = {
-    url: "https://analytics-h3.deno.dev/api/capture",
+    url: "https://capture-analytics.deno.dev/api/capture",
   },
 ): Promise<Response | Error> {
   try {

@@ -1,4 +1,4 @@
-import { recap } from "@inbestigator/analytics";
+import { recap } from "@capture/analytics";
 import { assertEquals } from "@std/assert";
 
 Deno.test(async function successfulRecap() {
