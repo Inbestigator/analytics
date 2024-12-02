@@ -11,7 +11,6 @@ export default async function recap(
   messages: string[],
   options: {
     client: CaptureClient;
-    key: string;
   },
 ): Promise<unknown | Error> {
   try {
@@ -22,14 +21,14 @@ export default async function recap(
       {
         method: "GET",
         headers: {
-          Authorization: options.key,
+          Authorization: options.client.key,
         },
       },
     );
 
     if (!res.ok) throw new Error(res.statusText);
 
-    console.log(green("Recapped data"));
+    console.log(green("Recapped"), messages.join(", "));
 
     return res.json();
   } catch (error) {

@@ -25,7 +25,7 @@ export default async function capture(
           timestamp: new Date().toISOString(),
         }),
         headers: {
-          Authorization: options.client.publicKey,
+          Authorization: options.client.key,
           "Content-Type": "application/json",
         },
       },

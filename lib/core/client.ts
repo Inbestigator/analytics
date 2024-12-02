@@ -4,10 +4,8 @@ import recap from "./recap.ts";
 type ClientOptions = {
   /** Your client id. */
   clientId: string;
-  /** Your public key, used for capturing analytics. */
-  publicKey: string;
-  /** Your private key, used for recapping logs. */
-  privateKey?: string;
+  /** The key to use, can be public or private. Public can only capture logs. */
+  key: string;
   /** Use your own API. */
   url?: string;
 };
@@ -19,16 +17,14 @@ type ClientOptions = {
  * @param options - The options for the client.
  */
 export default class CaptureClient {
-  private privateKey?: string;
   clientId: string;
-  publicKey: string;
+  key: string;
   url: string;
 
   constructor(options: ClientOptions) {
     this.clientId = options.clientId;
-    this.publicKey = options.publicKey;
-    this.privateKey = options.privateKey;
-    this.url = options.url ?? "https://capture-analytics.deno.dev";
+    this.key = options.key;
+    this.url = options.url ?? "https://capture.deno.dev";
   }
 
   /**
@@ -45,12 +41,16 @@ export default class CaptureClient {
   /**
    * Re-capture logs.
    *
-   * If no private key is set, this method will return an error.
+   * If a private key is not given, this method will return an error.
    *
    * @param messages - The messages to look up.
    */
   recap = (messages: string[]): Promise<unknown | Error> =>
-    this.privateKey
-      ? recap(messages, { client: this, key: this.privateKey })
-      : Promise.reject(new Error("Missing private key in client"));
+    this.key.startsWith("cak_r")
+      ? recap(messages, { client: this })
+      : Promise.reject(
+        new Error(
+          "Private key not given to client, please provide a private key to use the recap method",
+        ),
+      );
 }
