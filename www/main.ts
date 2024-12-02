@@ -258,7 +258,7 @@ app.use(async (ctx, next) => {
     );
     return;
   }
-  kv.atomic().set(["ratelimit", ip], current + 1, { expireIn: window });
+  kv.atomic().set(["ratelimit", ip], current + 1, { expireIn: window }).commit();
   next();
 });
 
