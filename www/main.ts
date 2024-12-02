@@ -255,4 +255,13 @@ app.use(async (ctx, next) => {
 app.use(router.routes());
 app.use(router.allowedMethods());
 
+app.use(async (ctx, next) => {
+  const root = `${Deno.cwd()}/src`;
+  try {
+    await ctx.send({ root, index: "index.html" });
+  } catch {
+    next();
+  }
+});
+
 app.listen({ port: 8000 });

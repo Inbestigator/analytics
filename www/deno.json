@@ -2,7 +2,14 @@
   "tasks": {
     "dev": "deno run -A --watch main.ts"
   },
+  "compilerOptions": {
+    "lib": [
+      "deno.window",
+      "dom"
+    ]
+  },
   "imports": {
+    "@capture/analytics": "jsr:@capture/analytics@^0.2.1",
     "@libsql/client": "npm:@libsql/client@^0.14.0",
     "@oak/oak": "jsr:@oak/oak@^17.1.3",
     "@std/dotenv": "jsr:@std/dotenv@^0.225.2",
