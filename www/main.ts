@@ -131,6 +131,15 @@ router.post(
 const app = new Application();
 app.use(async (ctx, next) => {
   ctx.response.headers.set("Access-Control-Allow-Origin", "*");
+  ctx.response.headers.set(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS",
+  );
+  ctx.response.headers.set(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization, Accept",
+  );
+  ctx.response.headers.set("Access-Control-Allow-Credentials", "true");
   await next();
 });
 app.use(router.routes());
