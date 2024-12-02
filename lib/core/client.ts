@@ -7,7 +7,7 @@ type ClientOptions = {
   /** Your public key, used for capturing analytics. */
   publicKey: string;
   /** Your private key, used for recapping logs. */
-  privateKey: string;
+  privateKey?: string;
   /** Use your own API. */
   url?: string;
 };
@@ -19,7 +19,7 @@ type ClientOptions = {
  * @param options - The options for the client.
  */
 export default class CaptureClient {
-  private privateKey: string;
+  private privateKey?: string;
   clientId: string;
   publicKey: string;
   url: string;
@@ -45,8 +45,12 @@ export default class CaptureClient {
   /**
    * Re-capture logs.
    *
+   * If no private key is set, this method will return an error.
+   *
    * @param messages - The messages to look up.
    */
   recap = (messages: string[]): Promise<unknown | Error> =>
-    recap(messages, { client: this, key: this.privateKey });
+    this.privateKey
+      ? recap(messages, { client: this, key: this.privateKey })
+      : Promise.reject(new Error("Missing private key in client"));
 }
