@@ -3,7 +3,7 @@ import { createClient } from "@libsql/client";
 import "@std/dotenv/load";
 
 const client = createClient({
-  url: Deno.env.get("DATABASE_URL") ?? ":memory:",
+  url: Deno.env.get("DATABASE_URL") ?? "",
   authToken: Deno.env.get("DATABASE_KEY") ?? "",
 });
 

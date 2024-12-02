@@ -1,28 +1,35 @@
 import { green, red } from "@std/fmt/colors";
+import type CaptureClient from "./client.ts";
 
 /**
  * Captures a log message and sends it to analytics server.
  *
  * @param message - The message to capture.
- * @param data - Optional data to include with the message.
  * @param options - Options for the capture.
  */
 export default async function capture(
   message: string,
-  data?: Record<string | number | symbol, unknown>,
-  options = {
-    url: "https://capture-analytics.deno.dev/api/capture",
+  options: {
+    data?: Record<string | number | symbol, unknown>;
+    client: CaptureClient;
   },
 ): Promise<void | Error> {
   try {
-    const res = await fetch(options.url, {
-      method: "POST",
-      body: JSON.stringify({
-        message,
-        data,
-        timestamp: new Date().toISOString(),
-      }),
-    });
+    const res = await fetch(
+      `${options.client.url}/api/capture?id=${options.client.clientId}`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          message,
+          data: options.data,
+          timestamp: new Date().toISOString(),
+        }),
+        headers: {
+          Authorization: options.client.publicKey,
+          "Content-Type": "application/json",
+        },
+      },
+    );
 
     if (!res.ok) throw new Error(res.statusText);
 

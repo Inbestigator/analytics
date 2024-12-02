@@ -1,21 +1,29 @@
 import { green, red } from "@std/fmt/colors";
+import type CaptureClient from "./client.ts";
 
 /**
  * Re-capture logs.
  *
+ * @param messages - The messages to look up.
  * @param options - Options for the recap.
  */
 export default async function recap(
   messages: string[],
-  options = {
-    url: "https://capture-analytics.deno.dev/api/recap",
+  options: {
+    client: CaptureClient;
+    key: string;
   },
 ): Promise<unknown | Error> {
   try {
     const res = await fetch(
-      options.url + `?messages=${encodeURIComponent(JSON.stringify(messages))}`,
+      `${options.client.url}/api/recap?id=${options.client.clientId}&messages=${
+        encodeURIComponent(JSON.stringify(messages))
+      }`,
       {
         method: "GET",
+        headers: {
+          Authorization: options.key,
+        },
       },
     );
 

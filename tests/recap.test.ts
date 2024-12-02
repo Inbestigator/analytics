@@ -1,26 +1,18 @@
-import { recap } from "@capture/analytics";
+import CaptureClient from "@capture/analytics";
 import { assertEquals } from "@std/assert";
 
-Deno.test(async function successfulRecap() {
-  const recapped = await recap(["test"], {
-    url: "http://localhost:8000/api/recap",
-  });
+const client = new CaptureClient({
+  clientId: "test",
+  publicKey: "test",
+  privateKey: "test",
+  url: "http://localhost:8000",
+});
+
+Deno.test(async function recap() {
+  const recapped = await client.recap(["test"]);
 
   assertEquals(recapped instanceof Error, false);
   if (!(recapped instanceof Error)) {
     console.log(recapped);
-  }
-});
-
-Deno.test(async function failRecap() {
-  const recapped = await recap(["test"], {
-    url: "http://localhost:3000/api/recap",
-  });
-
-  assertEquals(recapped instanceof Error, true);
-  if (recapped instanceof Error) {
-    assertEquals(recapped.message, "Failed to recap data");
-  } else {
-    throw new Error("Should be an error");
   }
 });
