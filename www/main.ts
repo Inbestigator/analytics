@@ -1,4 +1,4 @@
-import cuid from "cuid";
+import { createId } from "@paralleldrive/cuid2";
 import { Application, Context, Next, Router } from "@oak/oak";
 import { createClient } from "@libsql/client";
 import "@std/dotenv/load";
@@ -137,7 +137,7 @@ router.post(
       await client.execute({
         sql:
           `INSERT INTO captures (id, accountId, message, data) VALUES (?, ?, ?, ?)`,
-        args: [cuid(), id, data.message, JSON.stringify(data.data) ?? null],
+        args: [createId(), id, data.message, JSON.stringify(data.data) ?? null],
       });
 
       ctx.response.status = 200;
@@ -172,12 +172,12 @@ router.get("/api/keypair", async (ctx) => {
 
     await client.execute({
       sql: `INSERT INTO keys (id, key, accountId, type) VALUES (?, ?, ?, ?)`,
-      args: [cuid(), publicKey, id, "public"],
+      args: [createId(), publicKey, id, "public"],
     });
 
     await client.execute({
       sql: `INSERT INTO keys (id, key, accountId, type) VALUES (?, ?, ?, ?)`,
-      args: [cuid(), privateKey, id, "private"],
+      args: [createId(), privateKey, id, "private"],
     });
 
     ctx.response.status = 200;
@@ -210,7 +210,7 @@ router.post("/api/accounts", async (ctx) => {
       return;
     }
 
-    const id = cuid();
+    const id = createId();
 
     await client.execute({
       sql: `INSERT INTO accounts (id, name) VALUES (?, ?)`,
@@ -258,7 +258,8 @@ app.use(async (ctx, next) => {
     );
     return;
   }
-  kv.atomic().set(["ratelimit", ip], current + 1, { expireIn: window }).commit();
+  kv.atomic().set(["ratelimit", ip], current + 1, { expireIn: window })
+    .commit();
   next();
 });
 
