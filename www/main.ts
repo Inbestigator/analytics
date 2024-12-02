@@ -3,6 +3,8 @@ import { Application, Context, Next, Router } from "@oak/oak";
 import { createClient } from "@libsql/client";
 import "@std/dotenv/load";
 
+const kv = await Deno.openKv();
+
 async function generateKeyPair() {
   const keyPair = await crypto.subtle.generateKey(
     {
@@ -67,8 +69,7 @@ const authenticate = async (
   const id = ctx.request.url.searchParams.get("id");
 
   if (!key || !id) {
-    ctx.response.body = "Missing authorization or id";
-    ctx.response.status = 401;
+    ctx.throw(401, "Missing authorization or id");
     return;
   }
 
@@ -84,8 +85,7 @@ const authenticate = async (
   });
 
   if (rows.length === 0) {
-    ctx.response.body = "Invalid authorization or id";
-    ctx.response.status = 401;
+    ctx.throw(401, "Invalid authorization or id");
     return;
   }
 
@@ -100,8 +100,7 @@ router.get("/api/recap", authenticate, async (ctx) => {
   const id = params.get("id") ?? "";
 
   if (!Array.isArray(messages) || messages.length === 0) {
-    ctx.response.body = "No messages";
-    ctx.response.status = 400;
+    ctx.throw(400, "No messages");
     return;
   }
 
@@ -118,8 +117,7 @@ router.get("/api/recap", authenticate, async (ctx) => {
     ctx.response.body = rows;
   } catch (err) {
     console.error(err);
-    ctx.response.status = 500;
-    ctx.response.body = { error: (err as Error).message };
+    ctx.throw(500, (err as Error).message);
   }
 });
 
@@ -131,8 +129,7 @@ router.post(
     const id = ctx.request.url.searchParams.get("id") ?? "";
 
     if (!("message" in data)) {
-      ctx.response.body = "Missing message";
-      ctx.response.status = 400;
+      ctx.throw(400, "Missing message");
       return;
     }
 
@@ -147,8 +144,7 @@ router.post(
       ctx.response.body = { success: true };
     } catch (err) {
       console.error(err);
-      ctx.response.status = 500;
-      ctx.response.body = { error: (err as Error).message };
+      ctx.throw(500, (err as Error).message);
     }
   },
 );
@@ -157,8 +153,7 @@ router.get("/api/keypair", async (ctx) => {
   const id = ctx.request.url.searchParams.get("id") ?? "";
 
   if (!id) {
-    ctx.response.body = "Missing id";
-    ctx.response.status = 400;
+    ctx.throw(400, "Missing id");
     return;
   }
 
@@ -169,8 +164,7 @@ router.get("/api/keypair", async (ctx) => {
     });
 
     if (rows.length > 0) {
-      ctx.response.body = "Keys already exist for this account";
-      ctx.response.status = 400;
+      ctx.throw(400, "Keys already exist for this account");
       return;
     }
 
@@ -193,8 +187,7 @@ router.get("/api/keypair", async (ctx) => {
     };
   } catch (err) {
     console.error(err);
-    ctx.response.status = 500;
-    ctx.response.body = { error: (err as Error).message };
+    ctx.throw(500, (err as Error).message);
   }
 });
 
@@ -202,8 +195,7 @@ router.post("/api/accounts", async (ctx) => {
   const data = await ctx.request.body.json();
 
   if (!("name" in data)) {
-    ctx.response.body = "Missing name";
-    ctx.response.status = 400;
+    ctx.throw(400, "Missing name");
     return;
   }
 
@@ -214,8 +206,7 @@ router.post("/api/accounts", async (ctx) => {
     });
 
     if (rows.length > 0) {
-      ctx.response.body = "Account already exists";
-      ctx.response.status = 400;
+      ctx.throw(400, "Account already exists");
       return;
     }
 
@@ -233,8 +224,7 @@ router.post("/api/accounts", async (ctx) => {
     };
   } catch (err) {
     console.error(err);
-    ctx.response.status = 500;
-    ctx.response.body = { error: (err as Error).message };
+    ctx.throw(500, (err as Error).message);
   }
 });
 
@@ -254,6 +244,23 @@ app.use(async (ctx, next) => {
 });
 app.use(router.routes());
 app.use(router.allowedMethods());
+app.use(async (ctx, next) => {
+  const ip = ctx.request.ip;
+  const limit = 20;
+  const window = 60 * 1000;
+  const current = (await kv.get(["ratelimit", ip])).value ?? 0;
+  if (typeof current !== "number" || current > limit) {
+    ctx.throw(
+      429,
+      `Rate limit exceeded. You have made ${current} requests in the last ${
+        window / 1000
+      } seconds.`,
+    );
+    return;
+  }
+  kv.atomic().set(["ratelimit", ip], current + 1, { expireIn: window });
+  next();
+});
 
 app.use(async (ctx, next) => {
   const root = `${Deno.cwd()}/src`;
