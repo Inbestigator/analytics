@@ -5,6 +5,7 @@
   "imports": {
     "@libsql/client": "npm:@libsql/client@^0.14.0",
     "@oak/oak": "jsr:@oak/oak@^17.1.3",
-    "@std/dotenv": "jsr:@std/dotenv@^0.225.2"
+    "@std/dotenv": "jsr:@std/dotenv@^0.225.2",
+    "cuid": "npm:cuid@^3.0.0"
   }
 }
