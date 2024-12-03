@@ -245,6 +245,10 @@ app.use(async (ctx, next) => {
 app.use(router.routes());
 app.use(router.allowedMethods());
 app.use(async (ctx, next) => {
+  if (new URL(ctx.request.url).pathname.startsWith("/api/")) {
+    await next();
+    return;
+  }
   const ip = ctx.request.ip;
   const limit = 20;
   const window = 60 * 1000;
@@ -258,9 +262,10 @@ app.use(async (ctx, next) => {
     );
     return;
   }
-  kv.atomic().set(["ratelimit", ip], current + 1, { expireIn: window })
+  kv.atomic()
+    .set(["ratelimit", ip], current + 1, { expireIn: window })
     .commit();
-  next();
+  await next();
 });
 
 app.use(async (ctx, next) => {
@@ -268,7 +273,7 @@ app.use(async (ctx, next) => {
   try {
     await ctx.send({ root, index: "index.html" });
   } catch {
-    next();
+    await next();
   }
 });
 
