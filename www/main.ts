@@ -60,17 +60,16 @@ await client.execute(`
   );
 `);
 
-const authenticate = async (
+async function authenticate(
   ctx: Context,
   next: Next,
   enforcePrivate: boolean = true,
-) => {
+) {
   const key = ctx.request.headers.get("authorization");
   const id = ctx.request.url.searchParams.get("id");
 
   if (!key || !id) {
     ctx.throw(401, "Missing authorization or id");
-    return;
   }
 
   let sql = `SELECT * FROM keys WHERE key = ? AND accountId = ?`;
@@ -86,11 +85,10 @@ const authenticate = async (
 
   if (rows.length === 0) {
     ctx.throw(401, "Invalid authorization or id");
-    return;
   }
 
   await next();
-};
+}
 
 const router = new Router();
 
@@ -126,7 +124,12 @@ router.post(
   (ctx, next) => authenticate(ctx, next, false),
   async (ctx) => {
     const data = await ctx.request.body.json();
-    const id = ctx.request.url.searchParams.get("id") ?? "";
+    const id = ctx.request.url.searchParams.get("id");
+
+    if (!id) {
+      ctx.throw(400, "Missing id");
+      return;
+    }
 
     if (!("message" in data)) {
       ctx.throw(400, "Missing message");
@@ -150,7 +153,7 @@ router.post(
 );
 
 router.get("/api/keypair", async (ctx) => {
-  const id = ctx.request.url.searchParams.get("id") ?? "";
+  const id = ctx.request.url.searchParams.get("id");
 
   if (!id) {
     ctx.throw(400, "Missing id");

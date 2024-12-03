@@ -30,4 +30,7 @@ jobs:
         run: deno lint
 
       - name: Run tests
+        env:
+          TEST_CLIENT_ID: ${{ vars.TEST_CLIENT_ID }}
+          TEST_CLIENT_KEY: ${{ secrets.TEST_CLIENT_KEY }}
         run: deno test -A
