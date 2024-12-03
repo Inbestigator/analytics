@@ -57,7 +57,7 @@ document
     setKeys({ publicKey, privateKey });
 
     alert(
-      `Client ID: ${id}\nPublic key: ${publicKey}\nPrivate key: ${privateKey}`,
+      `Client ID: ${id}\n\nPublic key: ${publicKey}\n\nPrivate key: ${privateKey}`,
     );
   });
 
