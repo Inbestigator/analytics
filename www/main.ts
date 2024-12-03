@@ -92,6 +92,10 @@ async function authenticate(
 
 const router = new Router();
 
+router.get("/", (ctx) => {
+  ctx.response.body = Deno.readFileSync("./src/index.html");
+});
+
 router.get("/api/recap", authenticate, async (ctx) => {
   const params = ctx.request.url.searchParams;
   const messages = JSON.parse(params.get("messages") ?? "[]");
@@ -232,15 +236,6 @@ router.post("/api/accounts", async (ctx) => {
 });
 
 const app = new Application();
-
-app.use(async (ctx, next) => {
-  const root = `${Deno.cwd()}/src`;
-  try {
-    await ctx.send({ root, index: "index.html" });
-  } catch {
-    await next();
-  }
-});
 
 app.use(async (ctx, next) => {
   ctx.response.headers.set("Access-Control-Allow-Origin", "*");
