@@ -29,9 +29,21 @@ export async function getUserFromGitHubId(githubId: number): Promise<User | null
 	return result;
 }
 
+export async function getProjects(userId: string): Promise<Project[]> {
+	const projects = await db.select().from(table.project).where(eq(table.project.ownerId, userId));
+	return projects;
+}
+
 export interface User {
 	id: string;
 	githubId: number;
 	email: string;
 	username: string;
+}
+
+export interface Project {
+	id: string;
+	name: string;
+	createdAt: Date;
+	ownerId: string;
 }

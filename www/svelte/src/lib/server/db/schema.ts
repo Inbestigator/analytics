@@ -1,7 +1,10 @@
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
+import { createId } from '@paralleldrive/cuid2';
 
 export const user = sqliteTable('user', {
-	id: text('id').primaryKey().default('cuid()'),
+	id: text('id')
+		.primaryKey()
+		.$defaultFn(() => createId()),
 	githubId: integer('githubId').unique().notNull(),
 	email: text('email').notNull().unique(),
 	username: text('username').notNull()
@@ -16,7 +19,9 @@ export const session = sqliteTable('session', {
 });
 
 export const project = sqliteTable('project', {
-	id: text('id').primaryKey().default('cuid()'),
+	id: text('id')
+		.primaryKey()
+		.$defaultFn(() => createId()),
 	name: text('name').notNull().unique(),
 	createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
 	ownerId: text('owner_id')
@@ -25,7 +30,9 @@ export const project = sqliteTable('project', {
 });
 
 export const key = sqliteTable('key', {
-	id: text('id').primaryKey().default('cuid()'),
+	id: text('id')
+		.primaryKey()
+		.$defaultFn(() => createId()),
 	projectId: text('project_id')
 		.notNull()
 		.references(() => project.id),
@@ -35,7 +42,9 @@ export const key = sqliteTable('key', {
 });
 
 export const capture = sqliteTable('capture', {
-	id: text('id').primaryKey().default('cuid()'),
+	id: text('id')
+		.primaryKey()
+		.$defaultFn(() => createId()),
 	projectId: text('project_id')
 		.notNull()
 		.references(() => project.id),
