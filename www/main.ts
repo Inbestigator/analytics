@@ -229,6 +229,16 @@ router.post("/api/accounts", async (ctx) => {
 });
 
 const app = new Application();
+
+app.use(async (ctx, next) => {
+  const root = `${Deno.cwd()}/src`;
+  try {
+    await ctx.send({ root, index: "index.html" });
+  } catch {
+    await next();
+  }
+});
+
 app.use(async (ctx, next) => {
   ctx.response.headers.set("Access-Control-Allow-Origin", "*");
   ctx.response.headers.set(
@@ -266,15 +276,6 @@ app.use(async (ctx, next) => {
     .set(["ratelimit", ip], current + 1, { expireIn: window })
     .commit();
   await next();
-});
-
-app.use(async (ctx, next) => {
-  const root = `${Deno.cwd()}/src`;
-  try {
-    await ctx.send({ root, index: "index.html" });
-  } catch {
-    await next();
-  }
 });
 
 app.listen({ port: 8000 });
