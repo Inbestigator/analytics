@@ -1,5 +1,8 @@
 <svelte:head>
-	<title>GitHub OAuth example in SvelteKit</title>
+	<title>Capture</title>
+	<style>
+		@import '../app.css';
+	</style>
 </svelte:head>
 
 <slot />
