@@ -1,5 +1,5 @@
 import { db } from "@/server/db";
-import { NextResponse, type NextRequest } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 export default async function authenticate(
   req: NextRequest,

@@ -1,5 +1,5 @@
 import { signIn, signOut } from "@/server/auth";
-import { User, LogOut } from "lucide-react";
+import { LogOut, User } from "lucide-react";
 import { Button } from "./ui/button";
 
 export default function AuthButton({

@@ -32,5 +32,5 @@ jobs:
       - name: Run tests
         run: deno test -A
         env:
-          TEST_CLIENT_ID: ${{ vars.TEST_CLIENT_ID }}
-          TEST_CLIENT_KEY: ${{ secrets.TEST_CLIENT_KEY }}
+          TEST_PROJECT_ID: ${{ vars.TEST_PROJECT_ID }}
+          TEST_PROJECT_KEY: ${{ secrets.TEST_PROJECT_KEY }}

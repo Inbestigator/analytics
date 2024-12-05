@@ -31,9 +31,8 @@ export function CreateEvent({ id }: { id: string }) {
         onChange={(e) =>
           setName(
             e.target.value
-              .toLowerCase()
               .replaceAll(/\s+/g, "-")
-              .replaceAll(/[^a-z-]/g, ""),
+              .replaceAll(/[^a-zA-Z-]/g, ""),
           )
         }
       />

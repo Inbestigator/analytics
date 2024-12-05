@@ -2,8 +2,8 @@ import capture from "./capture.ts";
 import recap from "./recap.ts";
 
 type ClientOptions = {
-  /** Your client id. */
-  clientId: string;
+  /** Your project's id. */
+  projectId: string;
   /** The key to use, can be public or private. Public can only capture logs. */
   key: string;
   /** Use your own API. */
@@ -17,14 +17,14 @@ type ClientOptions = {
  * @param options - The options for the client.
  */
 export default class CaptureClient {
-  clientId: string;
+  projectId: string;
   key: string;
   url: string;
 
   constructor(options: ClientOptions) {
-    this.clientId = options.clientId;
+    this.projectId = options.projectId;
     this.key = options.key;
-    this.url = options.url ?? "https://capture.deno.dev";
+    this.url = options.url ?? "https://capture-analytics.vercel.app";
   }
 
   /**
@@ -35,7 +35,7 @@ export default class CaptureClient {
    */
   capture = (
     event: string,
-    data?: Record<string, unknown>,
+    data?: Record<string, unknown>
   ): Promise<void | Error> => capture(event, { data, client: this });
 
   /**
@@ -49,8 +49,8 @@ export default class CaptureClient {
     this.key.startsWith("cak_r")
       ? recap(events, { client: this })
       : Promise.reject(
-        new Error(
-          "Private key not given to client, please provide a private key to use the recap method",
-        ),
-      );
+          new Error(
+            "Private key not given to client, please provide a private key to use the recap method"
+          )
+        );
 }

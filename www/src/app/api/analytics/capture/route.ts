@@ -1,4 +1,4 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import authenticate from "../../authenticate";
 import { db } from "@/server/db";
 import type { InputJsonValue } from "@prisma/client/runtime/library";
