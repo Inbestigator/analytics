@@ -15,7 +15,7 @@ export default async function recap(
 ): Promise<unknown | Error> {
   try {
     const res = await fetch(
-      `${options.client.url}/api/recap?id=${options.client.clientId}&events=${
+      `${options.client.url}/api/analytics/recap?id=${options.client.clientId}&events=${
         encodeURIComponent(JSON.stringify(events))
       }`,
       {

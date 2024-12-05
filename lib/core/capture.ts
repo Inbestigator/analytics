@@ -16,7 +16,7 @@ export default async function capture(
 ): Promise<void | Error> {
   try {
     const res = await fetch(
-      `${options.client.url}/api/capture?id=${options.client.clientId}`,
+      `${options.client.url}/api/analytics/capture?id=${options.client.clientId}`,
       {
         method: "POST",
         body: JSON.stringify({
