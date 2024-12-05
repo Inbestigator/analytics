@@ -29,6 +29,12 @@ export async function GET(req: NextRequest) {
           in: events,
         },
       },
+      select: {
+        id: true,
+        name: true,
+        capturedAt: true,
+        data: true,
+      },
     });
     return new NextResponse(JSON.stringify(captures), {
       status: 200,

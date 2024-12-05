@@ -1,6 +1,13 @@
 import { green, red } from "@std/fmt/colors";
 import type CaptureClient from "./client.ts";
 
+interface Event {
+  id: string;
+  name: string;
+  capturedAt: Date;
+  data: unknown | null;
+}
+
 /**
  * Re-capture events.
  *
@@ -12,7 +19,7 @@ export default async function recap(
   options: {
     client: CaptureClient;
   },
-): Promise<unknown | Error> {
+): Promise<Event[] | null> {
   try {
     const res = await fetch(
       `${options.client.url}/api/analytics/recap?id=${options.client.projectId}&events=${
@@ -30,10 +37,10 @@ export default async function recap(
 
     console.log(green("Recapped"), events.join(", "));
 
-    return res.json();
+    return await res.json() as Event[];
   } catch (error) {
     console.error(red("Failed to recap data"), error);
 
-    return new Error("Failed to recap data");
+    return null;
   }
 }
