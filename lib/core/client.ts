@@ -35,7 +35,7 @@ export default class CaptureClient {
    */
   capture = (
     event: string,
-    data?: Record<string, unknown>
+    data?: Record<string, unknown>,
   ): Promise<void | Error> => capture(event, { data, client: this });
 
   /**
@@ -49,8 +49,8 @@ export default class CaptureClient {
     this.key.startsWith("cak_r")
       ? recap(events, { client: this })
       : Promise.reject(
-          new Error(
-            "Private key not given to client, please provide a private key to use the recap method"
-          )
-        );
+        new Error(
+          "Private key not given to client, please provide a private key to use the recap method",
+        ),
+      );
 }
