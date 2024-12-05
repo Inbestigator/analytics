@@ -12,7 +12,7 @@ type ClientOptions = {
 
 /**
  * Creates a new instance of an analytics client with the given options.
- * The client can be used to capture messages and recap logs.
+ * The client can be used to capture events and recap logs.
  *
  * @param options - The options for the client.
  */
@@ -28,26 +28,26 @@ export default class CaptureClient {
   }
 
   /**
-   * Captures a log message and sends it to analytics server.
+   * Captures an event and sends it to the analytics server.
    *
-   * @param message - The message to capture.
-   * @param data - Optional data to include with the message.
+   * @param event - The event to capture.
+   * @param options - Options for the capture.
    */
   capture = (
-    message: string,
+    event: string,
     data?: Record<string, unknown>,
-  ): Promise<void | Error> => capture(message, { data, client: this });
+  ): Promise<void | Error> => capture(event, { data, client: this });
 
   /**
-   * Re-capture logs.
+   * Re-capture events.
    *
    * If a private key is not given, this method will return an error.
    *
-   * @param messages - The messages to look up.
+   * @param events - The events to look up.
    */
-  recap = (messages: string[]): Promise<unknown | Error> =>
+  recap = (events: string[]): Promise<unknown | Error> =>
     this.key.startsWith("cak_r")
-      ? recap(messages, { client: this })
+      ? recap(events, { client: this })
       : Promise.reject(
         new Error(
           "Private key not given to client, please provide a private key to use the recap method",
