@@ -2,21 +2,21 @@ import { green, red } from "@std/fmt/colors";
 import type CaptureClient from "./client.ts";
 
 /**
- * Re-capture logs.
+ * Re-capture events.
  *
- * @param messages - The messages to look up.
+ * @param events - The events to look up.
  * @param options - Options for the recap.
  */
 export default async function recap(
-  messages: string[],
+  events: string[],
   options: {
     client: CaptureClient;
   },
 ): Promise<unknown | Error> {
   try {
     const res = await fetch(
-      `${options.client.url}/api/recap?id=${options.client.clientId}&messages=${
-        encodeURIComponent(JSON.stringify(messages))
+      `${options.client.url}/api/recap?id=${options.client.clientId}&events=${
+        encodeURIComponent(JSON.stringify(events))
       }`,
       {
         method: "GET",
@@ -28,7 +28,7 @@ export default async function recap(
 
     if (!res.ok) throw new Error(res.statusText);
 
-    console.log(green("Recapped"), messages.join(", "));
+    console.log(green("Recapped"), events.join(", "));
 
     return res.json();
   } catch (error) {

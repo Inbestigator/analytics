@@ -9,16 +9,16 @@ export async function GET(req: NextRequest) {
   }
 
   const id = req.nextUrl.searchParams.get("id");
-  const messages = JSON.parse(
-    req.nextUrl.searchParams.get("messages") ?? "[]",
+  const events = JSON.parse(
+    req.nextUrl.searchParams.get("events") ?? "[]",
   ) as string[];
 
   if (!id) {
     return new NextResponse("Missing id", { status: 400 });
   }
 
-  if (!messages || !Array.isArray(messages)) {
-    return new NextResponse("Missing messages", { status: 400 });
+  if (!events || !Array.isArray(events)) {
+    return new NextResponse("Missing events", { status: 400 });
   }
 
   try {
@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
       where: {
         projectId: id,
         name: {
-          in: messages,
+          in: events,
         },
       },
     });

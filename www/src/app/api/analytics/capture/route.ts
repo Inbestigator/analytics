@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   }
 
   const data = (await req.json()) as {
-    message: string;
+    event: string;
     data?: InputJsonValue;
   };
   const id = req.nextUrl.searchParams.get("id");
@@ -19,13 +19,13 @@ export async function POST(req: NextRequest) {
     return new NextResponse("Missing id", { status: 400 });
   }
 
-  if (!("message" in data)) {
-    return new NextResponse("Missing message", { status: 400 });
+  if (!("event" in data)) {
+    return new NextResponse("Missing event", { status: 400 });
   }
 
   const event = await db.event.findFirst({
     where: {
-      name: data.message,
+      name: data.event,
     },
     select: {
       id: true,
@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     await db.capture.create({
       data: {
         projectId: id,
-        name: data.message,
+        name: data.event,
         data: data.data,
         eventId: event?.id,
       },

@@ -12,6 +12,7 @@ export function Projects() {
       <ProjectDialog
         key={project.id}
         project={project}
+        events={project.events}
         publicKey={project.keys[0]?.key}
       />
     ))

@@ -35,7 +35,7 @@ interface IDialogBackgroupProps
     VariantProps<typeof overlayVariants> {}
 
 const DialogBackdrop = React.forwardRef<HTMLDivElement, IDialogBackgroupProps>(
-  function DialogBackdrop(inputProps: IDialogBackgroupProps) {
+  function DialogBackdrop(inputProps: IDialogBackgroupProps, _forwardRef) {
     const { variant = "default", className, ...props } = inputProps;
 
     return (

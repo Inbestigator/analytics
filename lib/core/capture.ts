@@ -2,13 +2,13 @@ import { green, red } from "@std/fmt/colors";
 import type CaptureClient from "./client.ts";
 
 /**
- * Captures a log message and sends it to analytics server.
+ * Captures an event and sends it to the analytics server.
  *
- * @param message - The message to capture.
+ * @param event - The event to capture.
  * @param options - Options for the capture.
  */
 export default async function capture(
-  message: string,
+  event: string,
   options: {
     data?: Record<string | number | symbol, unknown>;
     client: CaptureClient;
@@ -20,7 +20,7 @@ export default async function capture(
       {
         method: "POST",
         body: JSON.stringify({
-          message,
+          event,
           data: options.data,
           timestamp: new Date().toISOString(),
         }),
@@ -33,12 +33,12 @@ export default async function capture(
 
     if (!res.ok) throw new Error(res.statusText);
 
-    console.log(green("Captured"), message);
+    console.log(green("Captured"), event);
 
     res.body?.cancel();
   } catch (error) {
-    console.error(red("Failed to capture"), message, error);
+    console.error(red("Failed to capture"), event, error);
 
-    return new Error(`Failed to capture "${message}"`);
+    return new Error(`Failed to capture "${event}"`);
   }
 }

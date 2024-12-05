@@ -5,15 +5,18 @@ import { useState } from "react";
 import { Dialog } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Text } from "./ui/text";
-import type { Project } from "@prisma/client";
+import type { Event, Project } from "@prisma/client";
 import { Copy, CopyCheck, Key } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { CreateEvent } from "./create-event";
 
 export default function ProjectDialog({
   project,
+  events,
   publicKey,
 }: {
   project: Project;
+  events: Event[];
   publicKey?: string;
 }) {
   const utils = api.useUtils();
@@ -53,6 +56,7 @@ export default function ProjectDialog({
           <Text as="h5">{project.name}</Text>
         </Dialog.Header>
         <section className="flex flex-col gap-4 p-4">
+          <Text as="h5">Project data</Text>
           <Text>Project ID: {project.id}</Text>
           {keys.publicKey && (
             <>
@@ -112,6 +116,18 @@ export default function ProjectDialog({
               {generateKeys.isPending ? "Generating keys..." : "Generate keys"}
             </Button>
           )}
+        </section>
+        <section className="flex flex-col gap-4 p-4">
+          <Text as="h5">Events</Text>
+          {events.map((event) => (
+            <Text
+              key={event.id}
+              className="w-fit cursor-pointer transition-all hover:text-red-500"
+            >
+              {event.name}
+            </Text>
+          ))}
+          <CreateEvent id={project.id} />
         </section>
         <Dialog.Footer>
           <Button
