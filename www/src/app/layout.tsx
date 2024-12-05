@@ -1,7 +1,7 @@
 import "@/styles/globals.css";
 
-import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
+import { Archivo_Black, Share_Tech } from "next/font/google";
 
 import { TRPCReactProvider } from "@/trpc/react";
 
@@ -11,13 +11,32 @@ export const metadata: Metadata = {
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
+const archivo = Archivo_Black({
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-head",
+});
+
+const share_tech = Share_Tech({
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-sans",
+});
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${GeistSans.variable}`}>
+    <html
+      lang="en"
+      className={`font-sans ${share_tech.variable} ${archivo.variable}`}
+    >
       <body>
-        <TRPCReactProvider>{children}</TRPCReactProvider>
+        <TRPCReactProvider>
+          <main className="mx-auto min-h-dvh max-w-5xl p-4">{children}</main>
+        </TRPCReactProvider>
       </body>
     </html>
   );

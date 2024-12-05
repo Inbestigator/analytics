@@ -1,10 +1,5 @@
+import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { z } from "zod";
-
-import {
-  createTRPCRouter,
-  protectedProcedure,
-} from "@/server/api/trpc";
-import { keys, projects } from "@/server/db/schema";
 
 async function generateKeyPair() {
   const keyPair = await crypto.subtle.generateKey(
@@ -33,35 +28,60 @@ export const projectRouter = createTRPCRouter({
   create: protectedProcedure
     .input(z.object({ name: z.string().min(1) }))
     .mutation(async ({ ctx, input }) => {
-      await ctx.db.insert(projects).values({
-        name: input.name,
-        createdById: ctx.session.user.id,
+      await ctx.db.project.create({
+        data: {
+          name: input.name
+            .toLowerCase()
+            .replaceAll(/\s+/g, "-")
+            .replaceAll(/[^a-z-]/g, ""),
+          createdBy: { connect: { id: ctx.session.user.id } },
+        },
       });
     }),
   generateKeys: protectedProcedure
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
+      const existingKey = await ctx.db.key.findFirst({
+        where: {
+          projectId: input,
+        },
+      });
+      if (existingKey) {
+        throw new Error("Only one pair of keys per project!");
+      }
       const { publicKey, privateKey } = await generateKeyPair();
-      await ctx.db.transaction(async (tx) => {
-        await tx.insert(keys).values({
-          projectId: input,
-          key: privateKey,
-          type: "public",
-        });
-
-        await tx.insert(keys).values({
-          projectId: input,
-          key: publicKey,
-          type: "private",
-        });
+      await ctx.db.key.createMany({
+        data: [
+          { projectId: input, key: publicKey, type: "PUBLIC" },
+          { projectId: input, key: privateKey, type: "PRIVATE" },
+        ],
       });
       return { publicKey, privateKey };
     }),
   getProjects: protectedProcedure.query(async ({ ctx }) => {
-    const projects = await ctx.db.query.projects.findMany({
-      orderBy: (projects, { desc }) => [desc(projects.createdAt)],
+    return await ctx.db.project.findMany({
+      where: {
+        createdById: ctx.session.user.id,
+      },
+      include: {
+        keys: {
+          take: 1,
+          where: {
+            type: "PUBLIC",
+          },
+        },
+      },
     });
-
-    return projects;
   }),
+
+  delete: protectedProcedure
+    .input(z.string())
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.project.delete({
+        where: {
+          id: input,
+          createdById: ctx.session.user.id,
+        },
+      });
+    }),
 });

@@ -1,5 +1,6 @@
 import { signIn, signOut } from "@/server/auth";
 import { User, LogOut } from "lucide-react";
+import { Button } from "./ui/button";
 
 export default function AuthButton({
   shouldLogout,
@@ -15,13 +16,13 @@ export default function AuthButton({
         else await signIn("github");
       }}
     >
-      <button
+      <Button
         title={`Sign ${shouldLogout ? "out" : "in"}`}
         type="submit"
         {...props}
       >
         {props.children ?? (shouldLogout ? <LogOut /> : <User />)}
-      </button>
+      </Button>
     </form>
   );
 }

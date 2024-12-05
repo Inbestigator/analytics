@@ -3,10 +3,10 @@
 import { useState } from "react";
 
 import { api } from "@/trpc/react";
+import Input from "./ui/input";
+import { Button } from "./ui/button";
 
 export function CreateProject() {
-  const [projects] = api.project.getProjects.useSuspenseQuery();
-
   const utils = api.useUtils();
   const [name, setName] = useState("");
   const createPost = api.project.create.useMutation({
@@ -17,34 +17,33 @@ export function CreateProject() {
   });
 
   return (
-    <div className="w-full max-w-xs">
-      {projects.length > 0 ? (
-        <p className="truncate">Your projects: {projects.map((p) => p.name)}</p>
-      ) : (
-        <p>You have no projects yet.</p>
-      )}
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          createPost.mutate({ name });
-        }}
-        className="flex flex-col gap-2"
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        createPost.mutate({ name });
+      }}
+      className="flex w-full max-w-xl gap-2"
+    >
+      <Input
+        type="text"
+        placeholder="Name"
+        value={name}
+        onChange={(e) =>
+          setName(
+            e.target.value
+              .toLowerCase()
+              .replaceAll(/\s+/g, "-")
+              .replaceAll(/[^a-z-]/g, ""),
+          )
+        }
+      />
+      <Button
+        type="submit"
+        disabled={createPost.isPending || name.length < 1}
+        className="w-fit"
       >
-        <input
-          type="text"
-          placeholder="Title"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="w-full rounded-full px-4 py-2 text-black"
-        />
-        <button
-          type="submit"
-          className="rounded-full bg-white/10 px-10 py-3 font-semibold transition hover:bg-white/20"
-          disabled={createPost.isPending}
-        >
-          {createPost.isPending ? "Submitting..." : "Submit"}
-        </button>
-      </form>
-    </div>
+        {createPost.isPending ? "Creating..." : "Create"}
+      </Button>
+    </form>
   );
 }
