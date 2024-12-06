@@ -73,7 +73,7 @@ export default async function fingerprint(): Promise<{
 
   const ip = await (async () => {
     try {
-      const response = await fetch("https://ipapi.co/json/");
+      const response = await fetch("https://ipapi.co/json/", { cache: "force-cache" });
       const data = await response.json();
       return data;
     } catch {
@@ -85,10 +85,17 @@ export default async function fingerprint(): Promise<{
     throw new Error("Failed to fetch IP or location data.");
   }
 
-  const userAgent = navigator.userAgent;
-  const { browserVersion, os, osVersion } = parseUserAgent(userAgent);
+  const userAgentResponse = await fetch("https://useragentstring.com/?getJSON=all", { cache: "force-cache" });
+  const userAgentData = await userAgentResponse.json();
 
-  const { isPrivate, browserName } = await detectIncognito();
+  const browserName = userAgentData.agent_name ?? "Unknown";
+  const browserVersion = userAgentData.agent_version ?? "Unknown";
+  const os = userAgentData.os_name ?? "Unknown";
+  const osVersion = userAgentData.os_versionNumber ?? "Unknown";
+
+  const userAgent = navigator.userAgent;
+
+  const { isPrivate } = await detectIncognito();
 
   return hashFingerprint({
     browserName,
@@ -140,22 +147,5 @@ export async function hashFingerprint(data: Fingerprint) {
           .join("");
       }),
     data: data,
-  };
-}
-
-function parseUserAgent(userAgent: string) {
-  const uaData =
-    /(?<browserName>[\w\s]+)\/(?<browserVersion>[\d\.]+)\s\((?<os>[\w\s]+)\sNT\s(?<osVersion>[\d\.]+).*?\)\s.*?(?<engine>[A-Za-z]+)\/(?<engineVersion>[\d\.]+)\s.*?(?<secondaryBrowser>[A-Za-z]+)\/(?<secondaryVersion>[\d\.]+)/
-      .exec(
-        userAgent,
-      );
-  return {
-    browserVersion: uaData?.groups?.browserVersion ?? "Unknown",
-    os: uaData?.groups?.os.trim() ?? "Unknown",
-    osVersion: uaData?.groups?.osVersion ?? "Unknown",
-    engine: uaData?.groups?.engine ?? "Unknown",
-    engineVersion: uaData?.groups?.engineVersion ?? "Unknown",
-    secondaryBrowser: uaData?.groups?.secondaryBrowser ?? "Unknown",
-    secondaryVersion: uaData?.groups?.secondaryVersion ?? "Unknown",
   };
 }
