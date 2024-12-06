@@ -1,7 +1,7 @@
 import { green, red } from "@std/fmt/colors";
 import type CaptureClient from "./client.ts";
 
-interface Event {
+export interface RecappedEvent {
   id: string;
   name: string;
   capturedAt: Date;
@@ -19,7 +19,7 @@ export default async function recap(
   options: {
     client: CaptureClient;
   },
-): Promise<Event[] | null> {
+): Promise<RecappedEvent[] | null> {
   try {
     const res = await fetch(
       `${options.client.url}/api/analytics/recap?id=${options.client.projectId}&events=${
@@ -37,7 +37,7 @@ export default async function recap(
 
     console.log(green("Recapped"), events.join(", "));
 
-    return await res.json() as Event[];
+    return await res.json();
   } catch (error) {
     console.error(red("Failed to recap data"), error);
 

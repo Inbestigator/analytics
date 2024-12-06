@@ -34,7 +34,7 @@ export default async function Home() {
               </Link>
             </div>
           </main>
-          <div className="absolute inset-0 -z-40 hidden overflow-hidden lg:block">
+          <div className="absolute inset-0 -z-10 hidden overflow-hidden lg:block">
             <Wires className="absolute -bottom-16 -right-16 -rotate-12 scale-150" />
           </div>
           <HomeParticles />

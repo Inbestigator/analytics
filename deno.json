@@ -1,6 +1,14 @@
 {
   "name": "@capture/analytics",
-  "version": "0.2.6",
+  "version": "0.2.8",
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "dom.asynciterable",
+      "deno.ns"
+    ]
+  },
   "publish": {
     "include": [
       "lib",
