@@ -126,12 +126,7 @@ export default async function fingerprint(): Promise<{
 export async function hashFingerprint(data: Fingerprint) {
   const standardizedData: Fingerprint = {
     ...data,
-    ip: "",
     incognito: false,
-    ipLocation: {
-      ...data.ipLocation,
-      network: "",
-    },
   };
   return {
     fingerprint: await crypto.subtle
@@ -144,7 +139,7 @@ export async function hashFingerprint(data: Fingerprint) {
           .map((byte) => byte.toString(16).padStart(2, "0"))
           .join("");
       }),
-    data: standardizedData,
+    data: data,
   };
 }
 
