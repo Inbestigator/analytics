@@ -1,5 +1,5 @@
 import capture from "./capture.ts";
-import recap from "./recap.ts";
+import recap, { type RecappedEvent } from "./recap.ts";
 
 type ClientOptions = {
   /** Your project's id. */
@@ -45,12 +45,13 @@ export default class CaptureClient {
    *
    * @param events - The events to look up.
    */
-  recap = (events: string[]): Promise<unknown | Error> =>
-    this.key.startsWith("cak_r")
-      ? recap(events, { client: this })
-      : Promise.reject(
-        new Error(
-          "Private key not given to client, please provide a private key to use the recap method",
-        ),
+  recap = (events: string[]): Promise<RecappedEvent[] | null> => {
+    if (!this.key.startsWith("cak_r")) {
+      throw new Error(
+        "Private key not given to client, please provide a private key to use the recap method",
       );
+    }
+
+    return recap(events, { client: this });
+  };
 }

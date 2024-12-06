@@ -13,7 +13,7 @@ export default async function capture(
     data?: Record<string | number | symbol, unknown>;
     client: CaptureClient;
   },
-): Promise<void | Error> {
+): Promise<void> {
   try {
     const res = await fetch(
       `${options.client.url}/api/analytics/capture?id=${options.client.projectId}`,
@@ -38,7 +38,6 @@ export default async function capture(
     res.body?.cancel();
   } catch (error) {
     console.error(red("Failed to capture"), event, error);
-
-    return new Error(`Failed to capture "${event}"`);
+    throw new Error(`Failed to capture "${event}"`);
   }
 }

@@ -8,6 +8,7 @@ import { Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Wires from "@/components/wires";
+import HomeParticles from "@/components/home-particles";
 
 export default async function Home() {
   const session = await auth();
@@ -33,9 +34,10 @@ export default async function Home() {
               </Link>
             </div>
           </main>
-          <div className="absolute inset-0 -z-50 hidden overflow-hidden lg:block">
+          <div className="absolute inset-0 -z-10 hidden overflow-hidden lg:block">
             <Wires className="absolute -bottom-16 -right-16 -rotate-12 scale-150" />
           </div>
+          <HomeParticles />
         </>
       )}
       {session?.user && (
