@@ -70,8 +70,16 @@ export const projectRouter = createTRPCRouter({
       where: {
         createdById: ctx.session.user.id,
       },
+      orderBy: {
+        updatedAt: "desc",
+      },
       include: {
         events: true,
+        _count: {
+          select: {
+            captures: true,
+          },
+        },
         keys: {
           take: 1,
           where: {

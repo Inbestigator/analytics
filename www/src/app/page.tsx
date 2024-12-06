@@ -24,7 +24,10 @@ export default async function Home() {
             <Text as="h1">Capture</Text>
             <Text as="h3">Analytics for the good ones</Text>
             <div className="flex gap-4">
-              <AuthButton>Sign in</AuthButton>
+              <AuthButton
+                defaultContent="Sign in"
+                pendingContent="Signing in"
+              />
               <Link target="_blank" href="https://jsr.io/@capture/analytics">
                 <Button variant="outline">JSR</Button>
               </Link>

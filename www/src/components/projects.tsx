@@ -14,6 +14,7 @@ export function Projects() {
         project={project}
         events={project.events}
         publicKey={project.keys[0]?.key}
+        captures={project._count.captures}
       />
     ))
   );

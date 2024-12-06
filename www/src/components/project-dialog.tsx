@@ -14,10 +14,12 @@ export default function ProjectDialog({
   project,
   events,
   publicKey,
+  captures,
 }: {
   project: Project;
   events: Event[];
   publicKey?: string;
+  captures: number;
 }) {
   const utils = api.useUtils();
   const [isFirst, setIsFirst] = useState(false);
@@ -57,11 +59,12 @@ export default function ProjectDialog({
         </Dialog.Header>
         <section className="flex flex-col gap-4 p-4">
           <Text as="h5">Project data</Text>
+          <Text>Captured events: {captures}</Text>
           <Text>Project ID: {project.id}</Text>
           {keys.publicKey && (
             <>
-              <Text>
-                Public key: {keys.publicKey}
+              <div className="flex items-center">
+                <Text className="truncate">Public key: {keys.publicKey}</Text>
                 <Button
                   variant="outline"
                   size="icon"
@@ -77,11 +80,13 @@ export default function ProjectDialog({
                     <Copy className="size-4" />
                   )}
                 </Button>
-              </Text>
+              </div>
               {isFirst && (
                 <>
-                  <Text>
-                    Private key: {keys.privateKey}
+                  <div className="flex items-center">
+                    <Text className="truncate">
+                      Private key: {keys.privateKey}
+                    </Text>
                     <Button
                       variant="outline"
                       size="icon"
@@ -99,7 +104,7 @@ export default function ProjectDialog({
                         <Copy className="size-4" />
                       )}
                     </Button>
-                  </Text>
+                  </div>
                   <Text className="text-base text-black/50">
                     This key will not be shown again!
                   </Text>
