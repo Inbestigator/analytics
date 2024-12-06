@@ -37,6 +37,40 @@ export default async function fingerprint(): Promise<{
     throw new Error("Must be in a browser environment");
   }
 
+  if (navigator.doNotTrack === "1") {
+    return {
+      fingerprint: (
+        await hashFingerprint({
+          browserName: crypto.randomUUID(),
+          os: crypto.randomUUID(),
+        } as Fingerprint)
+      ).fingerprint,
+      data: {
+        browserName: "",
+        browserVersion: "",
+        incognito: true,
+        ip: "",
+        ipLocation: {
+          accuracyRadius: 0,
+          city: { name: "Unknown" },
+          continent: { code: "XX", name: "Unknown" },
+          country: { code: "XX", name: "Unknown" },
+          latitude: 0,
+          longitude: 0,
+          postalCode: "Unknown",
+          subdivisions: [{ isoCode: "XX", name: "Unknown" }],
+          timezone: "Unknown",
+          org: "Unknown",
+          asn: "Unknown",
+          network: "Unknown",
+          languages: ["Unknown"],
+        },
+        os: "",
+        osVersion: "",
+      },
+    };
+  }
+
   const ip = await (async () => {
     try {
       const response = await fetch("https://ipapi.co/json/");
