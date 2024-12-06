@@ -1,6 +1,6 @@
 {
   "name": "@capture/analytics",
-  "version": "0.2.11",
+  "version": "0.2.12",
   "compilerOptions": {
     "lib": [
       "dom",

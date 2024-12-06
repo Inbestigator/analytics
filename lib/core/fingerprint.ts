@@ -6,7 +6,6 @@ interface Fingerprint {
   incognito: boolean;
   ip: string;
   ipLocation: {
-    accuracyRadius: number;
     city: { name: string };
     continent: { code: string; name: string };
     country: { code: string; name: string };
@@ -22,6 +21,8 @@ interface Fingerprint {
   };
   os: string;
   osVersion: string;
+  maxTouchPoints: number;
+  hardwareConcurrency: number;
 }
 
 /**
@@ -33,7 +34,10 @@ export default async function fingerprint(): Promise<{
   fingerprint: string;
   data: Fingerprint;
 }> {
-  if (typeof window === "undefined" || typeof navigator === "undefined") {
+  if (
+    typeof globalThis.document === "undefined" ||
+    typeof navigator === "undefined"
+  ) {
     throw new Error("Must be in a browser environment");
   }
 
@@ -51,29 +55,32 @@ export default async function fingerprint(): Promise<{
         incognito: true,
         ip: "",
         ipLocation: {
-          accuracyRadius: 0,
           city: { name: "Unknown" },
           continent: { code: "XX", name: "Unknown" },
           country: { code: "XX", name: "Unknown" },
           latitude: 0,
           longitude: 0,
           postalCode: "Unknown",
-          subdivisions: [{ isoCode: "XX", name: "Unknown" }],
+          subdivisions: [],
           timezone: "Unknown",
           org: "Unknown",
           asn: "Unknown",
           network: "Unknown",
-          languages: ["Unknown"],
+          languages: [],
         },
         os: "",
         osVersion: "",
+        hardwareConcurrency: 0,
+        maxTouchPoints: 0,
       },
     };
   }
 
   const ip = await (async () => {
     try {
-      const response = await fetch("https://ipapi.co/json/");
+      const response = await fetch("https://ipapi.co/json/", {
+        cache: "force-cache",
+      });
       const data = await response.json();
       return data;
     } catch {
@@ -85,7 +92,7 @@ export default async function fingerprint(): Promise<{
     throw new Error("Failed to fetch IP or location data.");
   }
 
-  const userAgent = navigator.userAgent;
+  const { hardwareConcurrency, maxTouchPoints, userAgent } = navigator;
   const { browserVersion, os, osVersion } = parseUserAgent(userAgent);
 
   const { isPrivate, browserName } = await detectIncognito();
@@ -96,7 +103,6 @@ export default async function fingerprint(): Promise<{
     incognito: isPrivate,
     ip: ip.ip,
     ipLocation: {
-      accuracyRadius: ip.accuracy ?? 5,
       city: { name: ip.city ?? "Unknown" },
       continent: {
         code: ip.continent_code ?? "XX",
@@ -120,6 +126,8 @@ export default async function fingerprint(): Promise<{
     },
     os,
     osVersion,
+    maxTouchPoints,
+    hardwareConcurrency,
   });
 }
 

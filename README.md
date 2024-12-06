@@ -1,8 +1,8 @@
 # Capture
 
-Capture is an analytics platform that allows users to capture and fetch
-analytical data. It provides a simple and intuitive way to manage analytical
-logging and user recognition.
+Capture is a tiny (3kb gzipped!) but capable analytics platform that allows you
+to capture and fetch analytical data. It provides a simple and intuitive way to
+manage analytical logging and user recognition.
 
 ## Features
 
