@@ -5,24 +5,49 @@ interface Fingerprint {
   browserVersion: string;
   incognito: boolean;
   ip: string;
+  type: string;
   ipLocation: {
     city: { name: string };
     continent: { code: string; name: string };
     country: { code: string; name: string };
+    region: { code: string; name: string };
     latitude: number;
     longitude: number;
     postalCode: string;
-    subdivisions: { isoCode: string; name: string }[];
     timezone: string;
     org: string;
-    asn: string;
-    network: string;
-    languages: string[];
+    asn: number;
   };
+  language: string;
   os: string;
   osVersion: string;
   maxTouchPoints: number;
   hardwareConcurrency: number;
+}
+
+interface IpRes {
+  ip: string;
+  success: boolean;
+  type: string;
+  continent: string;
+  continent_code: string;
+  country: string;
+  country_code: string;
+  region: string;
+  region_code: string;
+  city: string;
+  latitude: number;
+  longitude: number;
+  postal: string;
+  connection: {
+    asn: number;
+    org: string;
+    isp: string;
+  };
+  timezone: {
+    id: string;
+    abbr: string;
+  };
 }
 
 /**
@@ -54,20 +79,20 @@ export default async function fingerprint(): Promise<{
         browserVersion: "",
         incognito: true,
         ip: "",
+        type: "Unknown",
         ipLocation: {
           city: { name: "Unknown" },
           continent: { code: "XX", name: "Unknown" },
           country: { code: "XX", name: "Unknown" },
+          region: { code: "XX", name: "Unknown" },
           latitude: 0,
           longitude: 0,
           postalCode: "Unknown",
-          subdivisions: [],
           timezone: "Unknown",
           org: "Unknown",
-          asn: "Unknown",
-          network: "Unknown",
-          languages: [],
+          asn: 0,
         },
+        language: "Unknown",
         os: "",
         osVersion: "",
         hardwareConcurrency: 0,
@@ -78,17 +103,19 @@ export default async function fingerprint(): Promise<{
 
   const ip = await (async () => {
     try {
-      const response = await fetch("https://ipapi.co/json/", {
-        cache: "force-cache",
+      const response = await fetch("https://ipwho.is/", {
+        headers: {
+          "cache-control": "max-age=3600",
+        },
       });
-      const data = await response.json();
+      const data = (await response.json()) as IpRes;
       return data;
     } catch {
       return null;
     }
   })();
 
-  if (!ip) {
+  if (!ip || !ip.success) {
     throw new Error("Failed to fetch IP or location data.");
   }
 
@@ -102,28 +129,29 @@ export default async function fingerprint(): Promise<{
     browserVersion,
     incognito: isPrivate,
     ip: ip.ip,
+    type: ip.type,
     ipLocation: {
-      city: { name: ip.city ?? "Unknown" },
+      city: { name: ip.city },
       continent: {
-        code: ip.continent_code ?? "XX",
-        name: ip.continent_name ?? "Unknown",
+        code: ip.continent_code,
+        name: ip.continent,
       },
       country: {
-        code: ip.country_code ?? "XX",
-        name: ip.country_name ?? "Unknown",
+        code: ip.country_code,
+        name: ip.country,
       },
-      latitude: ip.latitude ?? 0,
-      longitude: ip.longitude ?? 0,
-      postalCode: ip.postal ?? "Unknown",
-      subdivisions: [
-        { isoCode: ip.region_code ?? "Unknown", name: ip.region ?? "Unknown" },
-      ],
-      timezone: ip.timezone ?? "UTC",
-      org: ip.org ?? "Unknown",
-      asn: ip.asn ?? "Unknown",
-      network: ip.network ?? "Unknown",
-      languages: ip.languages?.split(",") ?? [],
+      region: {
+        code: ip.region_code,
+        name: ip.region,
+      },
+      latitude: ip.latitude,
+      longitude: ip.longitude,
+      postalCode: ip.postal,
+      timezone: ip.timezone.id,
+      org: ip.connection.org,
+      asn: ip.connection.asn,
     },
+    language: navigator.language,
     os,
     osVersion,
     maxTouchPoints,
