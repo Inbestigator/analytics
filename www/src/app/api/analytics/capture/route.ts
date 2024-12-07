@@ -64,6 +64,7 @@ export async function POST(req: NextRequest) {
   const event = await db.event.findFirst({
     where: {
       name: data.event,
+      projectId: id,
     },
     select: {
       id: true,

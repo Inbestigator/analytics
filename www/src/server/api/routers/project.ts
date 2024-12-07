@@ -51,11 +51,25 @@ export const projectRouter = createTRPCRouter({
         throw new Error("Only one pair of keys per project!");
       }
       const { publicKey, privateKey } = await generateKeyPair();
-      await ctx.db.key.createMany({
-        data: [
-          { projectId: input, key: publicKey, type: "PUBLIC" },
-          { projectId: input, key: privateKey, type: "PRIVATE" },
-        ],
+      await ctx.db.$transaction(async (tx) => {
+        await tx.key.create({
+          data: {
+            project: {
+              connect: { id: input, createdById: ctx.session.user.id },
+            },
+            key: publicKey,
+            type: "PUBLIC",
+          },
+        });
+        await tx.key.create({
+          data: {
+            project: {
+              connect: { id: input, createdById: ctx.session.user.id },
+            },
+            key: privateKey,
+            type: "PRIVATE",
+          },
+        });
       });
       return { publicKey, privateKey };
     }),
@@ -70,7 +84,9 @@ export const projectRouter = createTRPCRouter({
       await ctx.db.event.create({
         data: {
           name: input.event,
-          projectId: input.id,
+          project: {
+            connect: { id: input.id, createdById: ctx.session.user.id },
+          },
         },
       });
     }),
