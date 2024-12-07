@@ -10,7 +10,7 @@ export type Schema =
   | { type: "array"; items: Schema[] };
 
 function generateSchema(json: unknown): Schema {
-  if (!json) return { type: "null" };
+  if (json === null) return { type: "null" };
   switch (typeof json) {
     case "string": {
       return { type: "string" };
