@@ -9,6 +9,7 @@ import type { Event, Project } from "@prisma/client";
 import { Copy, CopyCheck, Key } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { CreateEvent } from "./create-event";
+import EventDialog from "./event-dialog";
 
 export default function ProjectDialog({
   project,
@@ -125,12 +126,7 @@ export default function ProjectDialog({
         <section className="flex flex-col gap-4 p-4">
           <Text as="h5">Events</Text>
           {events.map((event) => (
-            <Text
-              key={event.id}
-              className="w-fit cursor-pointer transition-all hover:text-red-500"
-            >
-              {event.name}
-            </Text>
+            <EventDialog key={event.id} event={event} />
           ))}
           <CreateEvent id={project.id} />
         </section>

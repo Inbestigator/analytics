@@ -75,6 +75,44 @@ export const projectRouter = createTRPCRouter({
         },
       });
     }),
+  setSchema: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        schema: z.string().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.event.update({
+        where: {
+          id: input.id,
+          project: { createdById: ctx.session.user.id },
+        },
+        data: {
+          schema: input.schema,
+        },
+      });
+    }),
+  deleteEvent: protectedProcedure
+    .input(z.string())
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.event.delete({
+        where: {
+          id: input,
+          project: { createdById: ctx.session.user.id },
+        },
+      });
+    }),
+  delete: protectedProcedure
+    .input(z.string())
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.project.delete({
+        where: {
+          id: input,
+          createdById: ctx.session.user.id,
+        },
+      });
+    }),
   getProjects: protectedProcedure.query(async ({ ctx }) => {
     return await ctx.db.project.findMany({
       where: {
@@ -99,14 +137,4 @@ export const projectRouter = createTRPCRouter({
       },
     });
   }),
-  delete: protectedProcedure
-    .input(z.string())
-    .mutation(async ({ ctx, input }) => {
-      await ctx.db.project.delete({
-        where: {
-          id: input,
-          createdById: ctx.session.user.id,
-        },
-      });
-    }),
 });
