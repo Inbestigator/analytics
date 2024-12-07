@@ -95,6 +95,7 @@ model Event {
     name      String
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+    schema    Json?
 
     project   Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
     projectId String

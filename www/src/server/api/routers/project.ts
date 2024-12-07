@@ -59,10 +59,20 @@ export const projectRouter = createTRPCRouter({
       return { publicKey, privateKey };
     }),
   addEvent: protectedProcedure
-    .input(z.object({ id: z.string(), event: z.string() }))
+    .input(
+      z.object({
+        id: z.string(),
+        event: z.string(),
+        schema: z.string().optional(),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
       await ctx.db.event.create({
-        data: { name: input.event, projectId: input.id },
+        data: {
+          name: input.event,
+          projectId: input.id,
+          schema: input.schema,
+        },
       });
     }),
   getProjects: protectedProcedure.query(async ({ ctx }) => {
