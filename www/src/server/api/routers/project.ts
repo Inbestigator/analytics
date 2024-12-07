@@ -77,17 +77,25 @@ export const projectRouter = createTRPCRouter({
     .input(
       z.object({
         id: z.string(),
-        schema: z.string().optional(),
+        schema: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      function parse(input: string): unknown {
+        try {
+          return JSON.parse(input);
+        } catch {
+          return input;
+        }
+      }
+
       await ctx.db.event.update({
         where: {
           id: input.id,
           project: { createdById: ctx.session.user.id },
         },
         data: {
-          schema: input.schema,
+          schema: JSON.stringify(parse(input.schema)),
         },
       });
     }),

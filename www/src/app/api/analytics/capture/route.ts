@@ -6,7 +6,8 @@ import { isDeepStrictEqual } from "util";
 
 export type Schema =
   | { type: "string" | "number" | "boolean" | "null" }
-  | { type: "object"; items: Record<string, Schema> };
+  | { type: "object"; items: Record<string, Schema> }
+  | { type: "array"; items: Schema[] };
 
 function generateSchema(json: unknown): Schema {
   if (!json) return { type: "null" };
@@ -21,12 +22,18 @@ function generateSchema(json: unknown): Schema {
       return { type: "boolean" };
     }
     case "object": {
-      const items: Record<string, Schema> = {};
-      Object.entries(json).forEach(([key, value]) => {
-        const schema = generateSchema(value);
-        items[key] = schema;
-      });
-      return { type: "object", items };
+      if (Array.isArray(json)) {
+        return { type: "array", items: json.map(generateSchema) };
+      }
+      return {
+        type: "object",
+        items: Object.fromEntries(
+          Object.entries(json).map(([key, value]) => [
+            key,
+            generateSchema(value),
+          ]),
+        ),
+      };
     }
     default: {
       return { type: "null" };

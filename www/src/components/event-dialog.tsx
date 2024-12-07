@@ -8,11 +8,20 @@ import type { Event } from "@prisma/client";
 import Textarea from "./ui/textarea";
 import { useState } from "react";
 
+function parse(input: string): unknown {
+  try {
+    return JSON.parse(input);
+  } catch {
+    return input;
+  }
+}
+
 export default function EventDialog({ event }: { event: Event }) {
   const utils = api.useUtils();
-  const [schema, setSchema] = useState(
-    event.schema ? JSON.stringify(JSON.parse(event.schema), undefined, 2) : "",
-  );
+  if (event.schema) {
+    event.schema = JSON.stringify(parse(event.schema as string), null, 2);
+  }
+  const [schema, setSchema] = useState(event.schema?.toString() ?? "");
 
   const saveSchema = api.project.setSchema.useMutation({
     onSuccess: async () => {
@@ -66,12 +75,20 @@ export default function EventDialog({ event }: { event: Event }) {
           </Button>
           <Button
             disabled={saveSchema.isPending}
-            onClick={() =>
+            onClick={() => {
+              try {
+                console.log(parse(schema));
+                parse(schema);
+              } catch (e) {
+                console.log(e);
+                alert("Your schema doesn't seem to be valid JSON!");
+                return;
+              }
               saveSchema.mutate({
                 id: event.id,
                 schema,
-              })
-            }
+              });
+            }}
           >
             {saveSchema.isPending ? "Saving..." : "Save"}
           </Button>
