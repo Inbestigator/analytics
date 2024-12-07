@@ -63,7 +63,6 @@ export const projectRouter = createTRPCRouter({
       z.object({
         id: z.string(),
         event: z.string(),
-        schema: z.string().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -71,7 +70,6 @@ export const projectRouter = createTRPCRouter({
         data: {
           name: input.event,
           projectId: input.id,
-          schema: input.schema,
         },
       });
     }),

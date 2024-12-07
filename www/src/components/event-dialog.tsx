@@ -11,7 +11,7 @@ import { useState } from "react";
 export default function EventDialog({ event }: { event: Event }) {
   const utils = api.useUtils();
   const [schema, setSchema] = useState(
-    event.schema ? JSON.stringify(event.schema, undefined, 2) : "",
+    event.schema ? JSON.stringify(JSON.parse(event.schema), undefined, 2) : "",
   );
 
   const saveSchema = api.project.setSchema.useMutation({
