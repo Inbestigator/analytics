@@ -1,4 +1,5 @@
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import { type InputJsonValue } from "@prisma/client/runtime/library";
 import { z } from "zod";
 
 async function generateKeyPair() {
@@ -81,9 +82,9 @@ export const projectRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      function parse(input: string): unknown {
+      function parse(input: string) {
         try {
-          return JSON.parse(input);
+          return JSON.parse(input) as InputJsonValue;
         } catch {
           return input;
         }
@@ -95,7 +96,7 @@ export const projectRouter = createTRPCRouter({
           project: { createdById: ctx.session.user.id },
         },
         data: {
-          schema: JSON.stringify(parse(input.schema)),
+          schema: parse(input.schema),
         },
       });
     }),

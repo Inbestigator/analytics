@@ -77,10 +77,8 @@ export default function EventDialog({ event }: { event: Event }) {
             disabled={saveSchema.isPending}
             onClick={() => {
               try {
-                console.log(parse(schema));
                 parse(schema);
-              } catch (e) {
-                console.log(e);
+              } catch {
                 alert("Your schema doesn't seem to be valid JSON!");
                 return;
               }
