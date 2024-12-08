@@ -20,7 +20,14 @@ export default function Wires(props: SVGProps<SVGSVGElement>) {
       />
       <path
         d="m123 269 24-10.246q9.815-19.038 14.684-29.811T171 205.651l24 11.393 23.289-41.126L243 212.189l25.116-31.415L291 125"
-        stroke="#bfbfbf"
+        strokeWidth={18}
+        stroke="black"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="m123 269 24-10.246q9.815-19.038 14.684-29.811T171 205.651l24 11.393 23.289-41.126L243 212.189l25.116-31.415L291 125"
+        stroke="#FFCC00"
         strokeLinecap="round"
         strokeLinejoin="round"
       />

@@ -1,7 +1,7 @@
 "use client";
 
 import { LogOut, User } from "lucide-react";
-import { Button } from "./ui/button";
+import { Button, type IButtonProps } from "./ui/button";
 import { useTransition } from "react";
 import { authAction } from "./auth-actions";
 
@@ -10,7 +10,7 @@ export default function AuthButton({
   pendingContent,
   shouldLogout,
   ...props
-}: React.ComponentProps<"button"> & {
+}: IButtonProps & {
   defaultContent?: React.ReactNode;
   pendingContent?: React.ReactNode;
   shouldLogout?: boolean;

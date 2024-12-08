@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Wires from "@/components/wires";
 import HomeParticles from "@/components/home-particles";
+import SiteHeader from "@/components/site-header";
+import { ExternalLink } from "lucide-react";
 
 export default async function Home() {
   const session = await auth();
@@ -30,7 +32,9 @@ export default async function Home() {
                 pendingContent="Signing in"
               />
               <Link target="_blank" href="https://jsr.io/@capture/analytics">
-                <Button variant="outline">JSR</Button>
+                <Button variant="outline" className="flex items-center gap-2">
+                  JSR <ExternalLink className="size-4" />
+                </Button>
               </Link>
             </div>
           </main>
@@ -41,12 +45,15 @@ export default async function Home() {
         </>
       )}
       {session?.user && (
-        <main className="flex flex-col items-center gap-4">
-          <CreateProject />
-          <Suspense>
-            <Projects />
-          </Suspense>
-        </main>
+        <>
+          <SiteHeader />
+          <main className="flex flex-col items-center gap-4">
+            <CreateProject />
+            <Suspense>
+              <Projects />
+            </Suspense>
+          </main>
+        </>
       )}
     </HydrateClient>
   );
