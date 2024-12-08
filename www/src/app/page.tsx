@@ -25,7 +25,7 @@ export default async function Home() {
         <>
           <main className="-my-4 flex min-h-dvh flex-col justify-center gap-4">
             <Text as="h1">Capture</Text>
-            <Text as="h3">Analytics for the good ones</Text>
+            <Text as="h3">Analytics you and your users can trust</Text>
             <div className="flex gap-4">
               <AuthButton
                 defaultContent="Sign in"
