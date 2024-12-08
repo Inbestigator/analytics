@@ -16,8 +16,7 @@ manage analytical logging and user recognition.
 
 To get started with Capture, follow these steps:
 
-1. Go to [our website](https://capture-analytics.vercel.app/) and create a new
-   project
+1. Go to [our website](https://capturejs.vercel.app/) and create a new project
 2. Copy your keys and project id
 3. Follow the installation instructions for your runtime on
    [the JSR page](https://jsr.io/@capture/analytics)

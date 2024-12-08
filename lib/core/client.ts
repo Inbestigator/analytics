@@ -25,7 +25,7 @@ export default class CaptureClient {
   constructor(options: ClientOptions) {
     this.projectId = options.projectId;
     this.key = options.key;
-    this.url = options.url ?? "https://capture-analytics.vercel.app";
+    this.url = options.url ?? "https://capturejs.vercel.app";
   }
 
   /**
