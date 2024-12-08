@@ -19,7 +19,7 @@ export default async function recap(
   options: {
     client: CaptureClient;
   },
-): Promise<RecappedEvent[] | null> {
+): Promise<RecappedEvent[]> {
   try {
     const res = await fetch(
       `${options.client.url}/api/analytics/recap?id=${options.client.projectId}&events=${
@@ -40,7 +40,6 @@ export default async function recap(
     return await res.json();
   } catch (error) {
     console.error(red("Failed to recap data"), error);
-
-    return null;
+    throw new Error(`Failed to recap ${events.join(", ")}`);
   }
 }

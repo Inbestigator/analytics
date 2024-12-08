@@ -1,5 +1,6 @@
 import capture from "./capture.ts";
-import recap, { type RecappedEvent } from "./recap.ts";
+import recap from "./recap.ts";
+import release from "./release.ts";
 
 type ClientOptions = {
   /** Your project's id. */
@@ -36,7 +37,7 @@ export default class CaptureClient {
   capture = (
     event: string,
     data?: Record<string, unknown>,
-  ): Promise<void | Error> => capture(event, { data, client: this });
+  ): ReturnType<typeof capture> => capture(event, { data, client: this });
 
   /**
    * Re-capture events.
@@ -45,7 +46,7 @@ export default class CaptureClient {
    *
    * @param events - The events to look up.
    */
-  recap = (events: string[]): Promise<RecappedEvent[] | null> => {
+  recap = (events: string[]): ReturnType<typeof recap> => {
     if (!this.key.startsWith("cak_r")) {
       throw new Error(
         "Private key not given to client, please provide a private key to use the recap method",
@@ -53,5 +54,20 @@ export default class CaptureClient {
     }
 
     return recap(events, { client: this });
+  };
+
+  /**
+   * Deletes a captured event.
+   *
+   * @param capture - The capture to delete.
+   */
+  release = (capture: string): ReturnType<typeof release> => {
+    if (!this.key.startsWith("cak_r")) {
+      throw new Error(
+        "Private key not given to client, please provide a private key to use the release method",
+      );
+    }
+
+    return release(capture, { client: this });
   };
 }

@@ -30,5 +30,5 @@ export default async function authenticate(
     return new NextResponse("Invalid authorization or id", { status: 401 });
   }
 
-  return;
+  return keyInDB;
 }

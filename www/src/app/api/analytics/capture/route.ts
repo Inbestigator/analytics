@@ -51,11 +51,6 @@ export async function POST(req: NextRequest) {
     event: string;
     data?: InputJsonValue;
   };
-  const id = req.nextUrl.searchParams.get("id");
-
-  if (!id) {
-    return new NextResponse("Missing id", { status: 400 });
-  }
 
   if (!("event" in data)) {
     return new NextResponse("Missing event", { status: 400 });
@@ -64,7 +59,7 @@ export async function POST(req: NextRequest) {
   const event = await db.event.findFirst({
     where: {
       name: data.event,
-      projectId: id,
+      projectId: authed.projectId,
     },
     select: {
       id: true,
@@ -86,10 +81,42 @@ export async function POST(req: NextRequest) {
   try {
     await db.capture.create({
       data: {
-        projectId: id,
+        projectId: authed.projectId,
         name: data.event,
         data: data.data,
         eventId: event?.id,
+      },
+    });
+    return new NextResponse(null, {
+      status: 200,
+    });
+  } catch (err) {
+    return new NextResponse(null, {
+      status: 500,
+      statusText: (err as Error).message,
+    });
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  const authed = await authenticate(req);
+  if (authed instanceof NextResponse) {
+    return authed;
+  }
+
+  const data = (await req.json()) as {
+    capture: string;
+  };
+
+  if (!("capture" in data)) {
+    return new NextResponse("Missing capture id", { status: 400 });
+  }
+
+  try {
+    await db.capture.delete({
+      where: {
+        id: data.capture,
+        projectId: authed.projectId,
       },
     });
     return new NextResponse(null, {

@@ -8,14 +8,9 @@ export async function GET(req: NextRequest) {
     return authed;
   }
 
-  const id = req.nextUrl.searchParams.get("id");
   const events = JSON.parse(
     req.nextUrl.searchParams.get("events") ?? "[]",
   ) as string[];
-
-  if (!id) {
-    return new NextResponse("Missing id", { status: 400 });
-  }
 
   if (!events || !Array.isArray(events)) {
     return new NextResponse("Missing events", { status: 400 });
@@ -24,7 +19,7 @@ export async function GET(req: NextRequest) {
   try {
     const captures = await db.capture.findMany({
       where: {
-        projectId: id,
+        projectId: authed.projectId,
         name: {
           in: events,
         },

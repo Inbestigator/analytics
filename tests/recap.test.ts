@@ -1,11 +1,13 @@
-import { assertEquals } from "@std/assert";
 import client from "./client.ts";
 
-Deno.test(async function recap() {
+Deno.test(async function recapAndRelease() {
   const recapped = await client.recap(["test"]);
 
-  assertEquals(recapped instanceof Error, false);
-  if (!(recapped instanceof Error)) {
+  if (recapped) {
     console.log(recapped);
+
+    if (recapped.length > 0) {
+      await client.release(recapped[0].id);
+    }
   }
 });

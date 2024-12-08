@@ -9,6 +9,7 @@ manage analytical logging and user recognition.
 - **Capture Logs**: Create data captures for different events. Captures can be
   used to store analytical data.
 - **Re-capturing**: Get all of your captures with one call.
+- **Release**: Delete captured events
 - **User Fingerprinting**: Identify users across multiple sessions
 
 ## Getting Started
